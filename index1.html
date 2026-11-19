@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מרחב בטוח | הזמנת תורים למטפלים רגשיים</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Heebo', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 relative selection:bg-emerald-800 selection:text-white">
+
+  <!-- רקע חדר טיפולים מואר ומשקיף לנוף מרגיע -->
+  <div class="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+       style="background-image: url('https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=2000&q=80');">
+    <div class="absolute inset-0 bg-gradient-to-b from-stone-900/40 via-stone-100/80 to-stone-100/95"></div>
+  </div>
+
+  <!-- סרגל ניווט עליון -->
+  <header class="sticky top-0 z-30 glass-panel border-b border-stone-200/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-emerald-800 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+          מ
+        </div>
+        <div>
+          <span class="text-lg font-bold text-emerald-950 block leading-none">מרחב בטוח</span>
+          <span class="text-[11px] text-slate-500">פלטפורמת טיפול רגשי ותורים</span>
+        </div>
+      </div>
+
+      <!-- מעבר בין מסכים -->
+      <div class="flex items-center gap-1.5 bg-stone-100 p-1 rounded-2xl border border-stone-200/80">
+        <button onclick="switchTab('patient')" id="tab-patient"
+                class="tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-800 text-white shadow-xs transition">
+          אזור מטופל
+        </button>
+        <button onclick="switchTab('therapist')" id="tab-therapist"
+                class="tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-white transition">
+          אזור מטפל
+        </button>
+        <button onclick="switchTab('admin')" id="tab-admin"
+                class="tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-white transition">
+          ניהול מערכת
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== מסך 1: אזור מטופל ==================== -->
+  <main id="view-patient" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20">
+    <div class="text-center max-w-3xl mx-auto mb-8">
+      <h1 class="text-3xl sm:text-5xl font-bold text-white drop-shadow-sm mb-3">
+        מציאת מטפל רגשי בקצב שלך ובשקט מלא
+      </h1>
+      <p class="text-sm sm:text-base text-stone-100 drop-shadow-xs">
+        סינון מהיר לפי מיקום, זמינות, ותק וטווח מחירים • תהליך קביעת תור פשוט ב-3 לחיצות
+      </p>
+    </div>
+
+    <!-- מנוע סינון -->
+    <section class="glass-panel rounded-3xl p-5 sm:p-6 shadow-xl border border-white/70 mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">עיר / אזור</label>
+          <select id="filter-city" onchange="renderTherapists()"
+                  class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-700">
+            <option value="">כל הארץ</option>
+            <option value="ירושלים">ירושלים</option>
+            <option value="בני ברק">בני ברק והמרכז</option>
+            <option value="אשדוד">אשדוד והדרום</option>
+            <option value="חיפה">חיפה והצפון</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">תחום התמחות</label>
+          <select id="filter-specialty" onchange="renderTherapists()"
+                  class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-700">
+            <option value="">כל התחומים</option>
+            <option value="חרדה וחיזוק נפשי">חרדה וחיזוק נפשי</option>
+            <option value="ליווי רגשי ובניית ביטחון">ליווי רגשי ובניית ביטחון</option>
+            <option value="התמודדות עם משברים">התמודדות עם משברים</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+            מחיר מקסימלי: <span id="price-label" class="text-emerald-800 font-bold">₪450</span>
+          </label>
+          <input id="filter-price" type="range" min="150" max="600" step="10" value="450"
+                 oninput="document.getElementById('price-label').innerText = '₪' + this.value; renderTherapists();"
+                 class="w-full accent-emerald-800 cursor-pointer my-2.5" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">ותק מינימלי (שנים)</label>
+          <select id="filter-exp" onchange="renderTherapists()"
+                  class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-700">
+            <option value="0">הכל (כולל מטפלים חדשים)</option>
+            <option value="2">שנתיים ומעלה</option>
+            <option value="5">5 שנים ומעלה</option>
+            <option value="10">10 שנים ומעלה</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+            <input id="filter-online" type="checkbox" onchange="renderTherapists()"
+                   class="w-4 h-4 rounded accent-emerald-800" />
+            <span>אפשרות לטיפול מרחוק (אונליין)</span>
+          </label>
+          <button onclick="resetFilters()"
+                  class="w-full py-2 px-3 bg-stone-200/80 hover:bg-stone-300 text-slate-800 rounded-xl text-xs font-semibold transition">
+            איפוס מסננים
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- רשימת מטפלים -->
+    <section id="therapists-list" class="space-y-5"></section>
+  </main>
+
+  <!-- ==================== מסך 2: אזור מטפל ==================== -->
+  <main id="view-therapist" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20 space-y-6">
+    <div class="glass-panel rounded-3xl p-6 shadow-lg border border-white/70 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h2 class="text-2xl font-bold text-emerald-950">אזור אישי למטפל — יומן, זמינות ודוחות</h2>
+        <p class="text-sm text-slate-600 mt-1">ניהול שעות עבודה, חסימת הפסקות/חופשות, מרווחי זמן (Buffer) וייצוא דוח כספי</p>
+      </div>
+      <button onclick="exportCSV()"
+              class="px-4 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white text-sm font-semibold rounded-xl shadow-sm transition">
+        ייצוא דוח הכנסות (CSV / אקסל)
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- הגדרות מרווח וזמינות -->
+      <div class="glass-panel rounded-3xl p-6 shadow-md border border-white/70 space-y-4">
+        <h3 class="text-lg font-bold text-slate-900">הגדרות יומן ומרווחים</h3>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">מרווח בין פגישות (Buffer בדקות)</label>
+          <select id="buffer-select" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+            <option value="10">10 דקות</option>
+            <option value="15" selected>15 דקות</option>
+            <option value="30">30 דקות</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">מדיניות ביטול תור</label>
+          <select class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+            <option>עד 24 שעות לפני המפגש</option>
+            <option>עד 48 שעות לפני המפגש</option>
+          </select>
+        </div>
+        <div class="pt-2 border-t border-stone-200">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">חסימת שעה / חופשה מהירה</label>
+          <div class="flex gap-2">
+            <input id="block-slot-input" type="text" placeholder="לדוגמה: יום ג' 18:00"
+                   class="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm" />
+            <button onclick="addBlockedSlot()"
+                    class="px-3.5 py-2 bg-slate-800 text-white rounded-xl text-xs font-semibold hover:bg-slate-900">
+              חסום
+            </button>
+          </div>
+          <ul id="blocked-slots-list" class="mt-3 space-y-1.5 text-xs text-slate-700">
+            <li class="bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg flex justify-between">
+              <span>חופשה מתוכננת: יום ה' מ-14:00</span>
+              <span class="text-amber-800 font-semibold">חסום</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- תורים קרובים והיסטוריה -->
+      <div class="lg:col-span-2 glass-panel rounded-3xl p-6 shadow-md border border-white/70">
+        <h3 class="text-lg font-bold text-slate-900 mb-4">תורים קרובים ותנועות כספיות</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-right text-sm border-collapse">
+            <thead>
+              <tr class="border-b border-stone-200 text-xs text-slate-500">
+                <th class="py-2.5 px-3">מועד</th>
+                <th class="py-2.5 px-3">מטופל</th>
+                <th class="py-2.5 px-3">אופן מפגש</th>
+                <th class="py-2.5 px-3">סכום (₪)</th>
+                <th class="py-2.5 px-3">סטטוס</th>
+              </tr>
+            </thead>
+            <tbody id="therapist-appointments-body" class="divide-y divide-stone-100">
+              <tr>
+                <td class="py-3 px-3">היום, 16:00</td>
+                <td class="py-3 px-3 font-medium">דוד מ.</td>
+                <td class="py-3 px-3">קליניקה</td>
+                <td class="py-3 px-3 font-semibold">₪380</td>
+                <td class="py-3 px-3"><span class="px-2.5 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-900 font-semibold">מאושר</span></td>
+              </tr>
+              <tr>
+                <td class="py-3 px-3">מחר, 10:30</td>
+                <td class="py-3 px-3 font-medium">אביחי כ.</td>
+                <td class="py-3 px-3">אונליין</td>
+                <td class="py-3 px-3 font-semibold">₪350</td>
+                <td class="py-3 px-3"><span class="px-2.5 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-900 font-semibold">מאושר</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== מסך 3: ניהול מערכת ==================== -->
+  <main id="view-admin" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20 space-y-6">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="glass-panel rounded-2xl p-5 border border-white/70 shadow-sm">
+        <span class="text-xs text-slate-500 font-semibold">הכנסות מעמלות ומנויים (חודשי)</span>
+        <p class="text-2xl font-bold text-emerald-900 mt-1">₪24,850</p>
+      </div>
+      <div class="glass-panel rounded-2xl p-5 border border-white/70 shadow-sm">
+        <span class="text-xs text-slate-500 font-semibold">מטפלים מאומתים פעילים</span>
+        <p class="text-2xl font-bold text-slate-900 mt-1">48</p>
+      </div>
+      <div class="glass-panel rounded-2xl p-5 border border-white/70 shadow-sm">
+        <span class="text-xs text-slate-500 font-semibold">אחוז עמלה ברירת מחדל</span>
+        <p class="text-2xl font-bold text-slate-900 mt-1">6.5%</p>
+      </div>
+    </div>
+
+    <div class="glass-panel rounded-3xl p-6 shadow-md border border-white/70">
+      <h3 class="text-lg font-bold text-slate-900 mb-3">יומן פעולות מערכתי (Audit Log)</h3>
+      <ul class="space-y-2 text-xs text-slate-700">
+        <li class="bg-white/80 p-3 rounded-xl border border-stone-200/70 flex justify-between">
+          <span>אישור הסמכת מטפל חדש והפעלת תגית "מטפל חדש באתר"</span>
+          <span class="text-slate-400">היום, 09:40</span>
+        </li>
+        <li class="bg-white/80 p-3 rounded-xl border border-stone-200/70 flex justify-between">
+          <span>עדכון טבלת ערים ותחומי התמחות פעילים במערכת</span>
+          <span class="text-slate-400">אתמול, 17:15</span>
+        </li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- חלונית הזמנה ב-3 לחיצות עם נעילה ל-5 דקות -->
+  <div id="booking-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-100">
+      <div id="modal-step-form">
+        <div class="flex items-center justify-between bg-emerald-50 text-emerald-900 px-3.5 py-2 rounded-2xl text-xs font-semibold mb-4">
+          <span>המועד שמור עבורך זמנית</span>
+          <span id="lock-timer">05:00</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-1">אישור קביעת תור</h3>
+        <p id="modal-summary" class="text-sm text-slate-600 mb-4"></p>
+
+        <form onsubmit="confirmBooking(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">שם מלא</label>
+            <input id="patient-name" type="text" required placeholder="הזן שם מלא"
+                   class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-700" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">טלפון נייד לתזכורת</label>
+            <input id="patient-phone" type="tel" required placeholder="050-0000000"
+                   class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-700" />
+          </div>
+          <div class="flex gap-2.5 pt-2">
+            <button type="button" onclick="closeModal()"
+                    class="flex-1 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50">
+              ביטול
+            </button>
+            <button type="submit"
+                    class="flex-1 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-sm font-semibold shadow-sm">
+              אישור הזמנה
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div id="modal-step-success" class="hidden text-center py-4 space-y-3">
+        <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto text-xl font-bold">
+          ✓
+        </div>
+        <h3 class="text-xl font-bold text-slate-900">התור נקבע בהצלחה</h3>
+        <p id="success-details" class="text-sm text-slate-600"></p>
+        <button onclick="closeModal()"
+                class="w-full py-2.5 bg-emerald-800 text-white rounded-xl text-sm font-semibold mt-2">
+          סיום
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const therapistsData = [
+      {
+        id: 1,
+        name: 'דוד שפירא',
+        specialty: 'חרדה וחיזוק נפשי',
+        city: 'ירושלים',
+        price: 380,
+        introPrice: null,
+        exp: 9,
+        online: true,
+        isNew: false,
+        isFeatured: true,
+        slots: ['10:00', '12:00', '16:30', '18:30']
+      },
+      {
+        id: 2,
+        name: 'אביחי מלכה',
+        specialty: 'ליווי רגשי ובניית ביטחון',
+        city: 'בני ברק',
+        price: 320,
+        introPrice: 240,
+        exp: 1,
+        online: true,
+        isNew: true,
+        isFeatured: false,
+        slots: ['09:30', '11:30', '15:00', '17:30', '19:30']
+      },
+      {
+        id: 3,
+        name: 'משה ברקוביץ',
+        specialty: 'התמודדות עם משברים',
+        city: 'אשדוד',
+        price: 410,
+        introPrice: null,
+        exp: 14,
+        online: false,
+        isNew: false,
+        isFeatured: false,
+        slots: ['11:00', '14:00', '17:00']
+      }
+    ];
+
+    let activeBooking = null;
+    let timerInterval = null;
+
+    function switchTab(tabName) {
+      ['patient', 'therapist', 'admin'].forEach(t => {
+        document.getElementById('view-' + t).classList.toggle('hidden', t !== tabName);
+        const btn = document.getElementById('tab-' + t);
+        if (t === tabName) {
+          btn.className = 'tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-800 text-white shadow-xs transition';
+        } else {
+          btn.className = 'tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-white transition';
+        }
+      });
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-city').value = '';
+      document.getElementById('filter-specialty').value = '';
+      document.getElementById('filter-price').value = 450;
+      document.getElementById('price-label').innerText = '₪450';
+      document.getElementById('filter-exp').value = '0';
+      document.getElementById('filter-online').checked = false;
+      renderTherapists();
+    }
+
+    function renderTherapists() {
+      const city = document.getElementById('filter-city').value;
+      const specialty = document.getElementById('filter-specialty').value;
+      const maxPrice = Number(document.getElementById('filter-price').value);
+      const minExp = Number(document.getElementById('filter-exp').value);
+      const onlineOnly = document.getElementById('filter-online').checked;
+
+      const filtered = therapistsData.filter(t => {
+        if (city && t.city !== city) return false;
+        if (specialty && t.specialty !== specialty) return false;
+        if (t.price > maxPrice) return false;
+        if (t.exp < minExp) return false;
+        if (onlineOnly && !t.online) return false;
+        return true;
+      });
+
+      const container = document.getElementById('therapists-list');
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="glass-panel rounded-3xl p-8 text-center text-slate-600">
+            לא נמצאו מטפלים התואמים את הסינון שנבחר. נסה להרחיב את טווח המחיר או לבחור "כל הארץ".
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => `
+        <div class="glass-panel rounded-3xl p-6 shadow-sm border border-white/80 flex flex-col lg:flex-row justify-between gap-6">
+          <div class="space-y-2.5 max-w-xl">
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 class="text-xl font-bold text-slate-900">${t.name}</h2>${t.isFeatured ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-900">מומלץ</span>' : ''}
+              ${t.isNew ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-100 text-teal-900">מטפל חדש באתר • זמינות גבוהה</span>' : ''}
+            </div>
+            <p class="text-sm font-medium text-emerald-800">${t.specialty}</p>
+            <div class="flex flex-wrap gap-4 text-xs text-slate-600">
+              <span>עיר: <strong>${t.city}</strong></span>
+              <span>ותק: <strong>${t.exp} שנים</strong></span>
+              <span>${t.online ? 'קליניקה + אונליין' : 'קליניקה בלבד'}</span>
+            </div>
+            <div class="pt-1 flex items-baseline gap-2">
+              <span class="text-lg font-bold text-slate-900">₪${t.price}</span>
+              <span class="text-xs text-slate-500">לפגישה</span>
+              ${t.introPrice ? `<span class="text-xs font-semibold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-md">פגישת היכרות: ₪${t.introPrice}</span>` : ''}
+            </div>
+          </div>
+
+          <div class="lg:w-80 bg-stone-50/90 rounded-2xl p-4 border border-stone-200/80">
+            <div class="text-xs font-semibold text-slate-600 mb-2.5">בחר שעה פנויה (לחיצה 1 מתוך 3):</div>
+            <div class="grid grid-cols-3 gap-2">
+              ${t.slots.map(slot => `
+                <button onclick="openBooking(${t.id}, '${slot}')"
+                        class="py-2 px-2 bg-white hover:bg-emerald-800 hover:text-white text-emerald-900 font-semibold text-sm rounded-xl border border-emerald-200 transition">
+                  ${slot}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openBooking(therapistId, slot) {
+      const therapist = therapistsData.find(t => t.id === therapistId);
+      activeBooking = { therapist, slot };
+
+      document.getElementById('modal-step-form').classList.remove('hidden');
+      document.getElementById('modal-step-success').classList.add('hidden');
+      document.getElementById('modal-summary').innerHTML =
+        `מטפל: <strong>${therapist.name}</strong> (${therapist.city})<br/>שעה נבחרת: <strong>${slot}</strong>`;
+      document.getElementById('booking-modal').classList.remove('hidden');
+
+      let secondsLeft = 300;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsLeft--;
+        const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+        const secs = String(secondsLeft % 60).padStart(2, '0');
+        document.getElementById('lock-timer').innerText = `${mins}:${secs}`;
+        if (secondsLeft <= 0) {
+          clearInterval(timerInterval);
+          closeModal();
+        }
+      }, 1000);
+    }
+
+    function confirmBooking(e) {
+      e.preventDefault();
+      clearInterval(timerInterval);
+      const name = document.getElementById('patient-name').value;
+      const phone = document.getElementById('patient-phone').value;
+
+      // הסרת השעה מהרשימה הזמינה
+      activeBooking.therapist.slots = activeBooking.therapist.slots.filter(s => s !== activeBooking.slot);
+      renderTherapists();
+
+      // הוספה ליומן המטפל
+      const tbody = document.getElementById('therapist-appointments-body');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="py-3 px-3">היום, ${activeBooking.slot}</td>
+        <td class="py-3 px-3 font-medium">${name} (${phone})</td>
+        <td class="py-3 px-3">${activeBooking.therapist.online ? 'אונליין / קליניקה' : 'קליניקה'}</td>
+        <td class="py-3 px-3 font-semibold">₪${activeBooking.therapist.introPrice || activeBooking.therapist.price}</td>
+        <td class="py-3 px-3"><span class="px-2.5 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-900 font-semibold">מאושר</span></td>
+      `;
+      tbody.prepend(tr);
+
+      document.getElementById('modal-step-form').classList.add('hidden');
+      document.getElementById('modal-step-success').classList.remove('hidden');
+      document.getElementById('success-details').innerText =
+        `נקבע תור עבור ${name} אצל ${activeBooking.therapist.name} בשעה ${activeBooking.slot}.`; }  function closeModal() { clearInterval(timerInterval); document.getElementById('booking-modal').classList.add('hidden'); document.getElementById('patient-name').value = ''; document.getElementById('patient-phone').value = ''; }  function addBlockedSlot() { const input = document.getElementById('block-slot-input'); if (!input.value.trim()) return; const ul = document.getElementById('blocked-slots-list'); const li = document.createElement('li'); li.className = 'bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg flex justify-between'; li.innerHTML = `<span>${input.value.trim()}</span><span class="text-amber-800 font-semibold">חסום</span>`;
+      ul.prepend(li);
+      input.value = '';
+    }
+
+    function exportCSV() {
+      const rows = [
+        ['מועד', 'מטופל', 'אופן מפגש', 'סכום (₪)', 'סטטוס'],
+        ['היום, 16:00', 'דוד מ.', 'קליניקה', '380', 'מאושר'],
+        ['מחר, 10:30', 'אביחי כ.', 'אונליין', '350', 'מאושר']
+      ];
+      const csvContent = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'doch-hachnasot.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    renderTherapists();
+  </script>
+</body>
+</html>
